@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "Subscription": {
+      "title": "Subscription",
+      "description": "User newsletter subscription",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "topics": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "topics", "createdAt"]
+    },
+    "ContactMessage": {
+      "title": "Contact Message",
+      "description": "Message submitted via the contact form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "company": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/subscriptions/{subscriptionId}": {
+      "schema": "Subscription",
+      "description": "Newsletter subscriptions"
+    },
+    "/contact_messages/{messageId}": {
+      "schema": "ContactMessage",
+      "description": "Messages submitted via the contact form"
+    }
+  }
+}

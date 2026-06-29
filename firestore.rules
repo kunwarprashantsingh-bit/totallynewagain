@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: subscriptions
+    // Document ID: auto-generated
+    // Fields:
+    //   - email: string (required, email format) - User's email
+    //   - topics: list (required, strings) - Selected newsletter topics
+    //   - createdAt: string (required, ISO 8601) - Creation timestamp as string
+    //   - timestamp: timestamp (required) - Server-side timestamp
+    //
+    // Collection: contact_messages
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required, max 100 chars)
+    //   - email: string (required, email format)
+    //   - company: string (optional, max 100 chars)
+    //   - message: string (required, max 2000 chars)
+    //   - createdAt: string (required, ISO 8601)
+    //   - timestamp: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "KunwarPrashantSingh@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string &&
+        email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string &&
+        dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidSubscription(data) {
+      return hasRequiredFields(['email', 'topics', 'createdAt', 'timestamp']) &&
+             hasOnlyAllowedFields(['email', 'topics', 'createdAt', 'timestamp']) &&
+             isValidEmail(data.email) &&
+             data.topics is list &&
+             data.topics.size() <= 10 &&
+             isValidDateString(data.createdAt) &&
+             data.timestamp is timestamp;
+    }
+
+    function isValidContactMessage(data) {
+      return hasRequiredFields(['name', 'email', 'message', 'createdAt', 'timestamp']) &&
+             hasOnlyAllowedFields(['name', 'email', 'company', 'message', 'createdAt', 'timestamp']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             isValidEmail(data.email) &&
+             (!('company' in data) || (data.company is string && data.company.size() <= 100)) &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 2000 &&
+             isValidDateString(data.createdAt) &&
+             data.timestamp is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /subscriptions/{subscriptionId} {
+      // Anyone can subscribe
+      allow create: if isValidSubscription(request.resource.data);
+      
+      // Only admins can manage subscriptions
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /contact_messages/{messageId} {
+      // Anyone can submit a contact message
+      allow create: if isValidContactMessage(request.resource.data);
+      
+      // Only admins can read or manage contact messages
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

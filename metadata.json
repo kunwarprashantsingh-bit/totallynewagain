@@ -1,0 +1,10 @@
+{
+  "name": "Survvi Opulence Insights",
+  "description": "A cutting-edge, technology-driven platform for building materials consulting and energy market research, providing real-time data, AI-powered industrial insights, and global supply chain analysis.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
