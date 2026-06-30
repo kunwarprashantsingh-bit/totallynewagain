@@ -30,6 +30,12 @@ const DarkPoolFlowTool = React.lazy(() => import('./DarkPoolFlowTool'));
 const StagflationCrisisModeler = React.lazy(() => import('./StagflationCrisisModeler'));
 const TradeBarrierOptimizer = React.lazy(() => import('./TradeBarrierOptimizer'));
 
+const QuantumRiskAssessmentTool = React.lazy(() => import('./QuantumRiskAssessmentTool').then(m => ({ default: m.QuantumRiskAssessmentTool })));
+const CognitiveWarfareDashboard = React.lazy(() => import('./CognitiveWarfareDashboard').then(m => ({ default: m.CognitiveWarfareDashboard })));
+const OrbitalAssetMonitor = React.lazy(() => import('./OrbitalAssetMonitor').then(m => ({ default: m.OrbitalAssetMonitor })));
+const SyntheticDataGenerationEngine = React.lazy(() => import('./SyntheticDataGenerationEngine').then(m => ({ default: m.SyntheticDataGenerationEngine })));
+const AutonomousNegotiationSimulator = React.lazy(() => import('./AutonomousNegotiationSimulator').then(m => ({ default: m.AutonomousNegotiationSimulator })));
+
 const ToolSkeleton = () => (
   <div className="w-full h-[600px] bg-white/5 rounded-3xl animate-pulse flex items-center justify-center">
     <div className="flex flex-col items-center gap-4">
@@ -41,9 +47,14 @@ const ToolSkeleton = () => (
 
 const ClientIntelligenceSuite: React.FC<{ language: Language }> = ({ language }) => {
   const t = translations[language].intelligence;
-  const [activeTool, setActiveTool] = useState<'arbitrage' | 'decarbonization' | 'hedging' | 'inflection' | 'altdata' | 'geopolitics' | 'flows' | 'threats' | 'correlation' | 'modeler' | 'volatility' | 'supply-chain' | 'consultant' | 'compliance' | 'benchmarking' | 'sentiment' | 'allocator' | 'darkpool' | 'stagflation' | 'cbam'>('arbitrage');
+  const [activeTool, setActiveTool] = useState<'quantum' | 'cognitive' | 'orbital' | 'synthetic' | 'autonomous' | 'arbitrage' | 'decarbonization' | 'hedging' | 'inflection' | 'altdata' | 'geopolitics' | 'flows' | 'threats' | 'correlation' | 'modeler' | 'volatility' | 'supply-chain' | 'consultant' | 'compliance' | 'benchmarking' | 'sentiment' | 'allocator' | 'darkpool' | 'stagflation' | 'cbam'>('quantum');
 
   const tools = [
+    { id: 'quantum', name: 'Quantum Risk Assessment', icon: ShieldCheck },
+    { id: 'cognitive', name: 'Cognitive Warfare / Deepfakes', icon: Activity },
+    { id: 'orbital', name: 'Orbital SAR Monitor', icon: Navigation },
+    { id: 'synthetic', name: 'Synthetic Data Engine', icon: Database },
+    { id: 'autonomous', name: 'Autonomous M&A Simulator', icon: Cpu },
     { id: 'allocator', name: 'Sovereign SAA Allocator (No. 10)', icon: Landmark },
     { id: 'darkpool', name: 'Dark Pool Flows (No. 11)', icon: Database },
     { id: 'stagflation', name: 'Stagflation Sandbox (No. 12)', icon: ShieldAlert },
@@ -101,6 +112,11 @@ const ClientIntelligenceSuite: React.FC<{ language: Language }> = ({ language })
         <div className="bg-brand-light/20 border border-white/5 rounded-[40px] p-8 lg:p-12 min-h-[600px]">
           <AnimatePresence mode="wait">
             <Suspense fallback={<ToolSkeleton />}>
+              {activeTool === 'quantum' && <QuantumRiskAssessmentTool key="quantum" />}
+              {activeTool === 'cognitive' && <CognitiveWarfareDashboard key="cognitive" />}
+              {activeTool === 'orbital' && <OrbitalAssetMonitor key="orbital" />}
+              {activeTool === 'synthetic' && <SyntheticDataGenerationEngine key="synthetic" />}
+              {activeTool === 'autonomous' && <AutonomousNegotiationSimulator key="autonomous" />}
               {activeTool === 'allocator' && <SovereignAllocatorTool key="allocator" />}
               {activeTool === 'darkpool' && <DarkPoolFlowTool key="darkpool" />}
               {activeTool === 'stagflation' && <StagflationCrisisModeler key="stagflation" />}
